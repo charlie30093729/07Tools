@@ -17,6 +17,7 @@ using RunescapeTools.Infrastructure.Training;
 
 namespace RunescapeTools.Infrastructure.DependencyInjection;
 
+// Groups registrations for the application's shared services.
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddRunescapeToolsServices(
@@ -37,6 +38,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(marketOptions ?? new MarketDataOptions());
         services.AddSingleton(TimeProvider.System);
 
+        // Add HttpClient for OsrsWikiPriceClient and OsrsHiscoreClient
+        //these clients will be used to fetch data from the OSRS Wiki and Hiscores respectively
+        // Configure typed HTTP clients using the supplied options.
         services.AddHttpClient<IOsrsPriceClient, OsrsWikiPriceClient>(client =>
         {
             client.BaseAddress = wikiOptions.BaseAddress;
@@ -65,6 +69,7 @@ public static class ServiceCollectionExtensions
             });
         }
 
+        // Register shared stores, application services, catalogues and calculators.
         services.AddSingleton<IFavouriteStore, JsonFavouriteStore>();
         services.AddSingleton<IMarketDataService, MarketDataService>();
         if (priceHistoryStoreOptions is not null)
@@ -80,6 +85,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<TrainingPlanCalculator>();
         services.AddSingleton<TrainingMoneyMakingCalculator>();
 
+        // Register optional JSON stores when their configuration is supplied.
         if (trainingPlanOptions is not null)
         {
             services.AddSingleton(trainingPlanOptions);
@@ -91,7 +97,7 @@ public static class ServiceCollectionExtensions
             services.AddSingleton(moneyMakingPreferenceOptions);
             services.AddSingleton<IMoneyMakingPreferenceStore, JsonMoneyMakingPreferenceStore>();
         }
-
+        // Discover concrete money-making methods in the Core assembly and register each one.
         var methodTypes = typeof(IMoneyMakingMethod).Assembly
             .GetTypes()
             .Where(type => !type.IsAbstract
