@@ -38,7 +38,7 @@ public sealed class ShellViewModelTests
             new TrainingPlanCalculator(),
             new TrainingMoneyMakingCalculator(),
             market,
-            new MemoryTrainingPlanStore(),
+            new TrainingPlanPersistenceService(new MemoryTrainingPlanStore()),
             profileContext,
             moneyMakerSelection);
         var shell = new ShellViewModel(profile, dashboard, favourites, money, xpPlanner);

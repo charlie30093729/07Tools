@@ -78,7 +78,7 @@ public sealed class AshOfferingPlannerTests
         var context = new CurrentProfileContext(new FakeHiscoreClient(),
             new HiscoreParser(TimeProvider.System), new MemoryProfilePreferenceStore("bottleo"));
         var vm = new XpPlannerViewModel(new MainEhpCatalogue(), new TrainingPlanCalculator(),
-            new TrainingMoneyMakingCalculator(), market, new MemoryTrainingPlanStore(), context,
+            new TrainingMoneyMakingCalculator(), market, new TrainingPlanPersistenceService(new MemoryTrainingPlanStore()), context,
             new MoneyMakerSelectionContext());
         await vm.LoadAsync();
         var originalProfile = context.CurrentProfile;

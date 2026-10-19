@@ -23,7 +23,7 @@ public sealed class XpPlannerViewModelTests
             new TrainingPlanCalculator(),
             new TrainingMoneyMakingCalculator(),
             market,
-            new MemoryTrainingPlanStore(),
+            new TrainingPlanPersistenceService(new MemoryTrainingPlanStore()),
             context,
             new MoneyMakerSelectionContext());
 
@@ -51,7 +51,7 @@ public sealed class XpPlannerViewModelTests
             new TrainingPlanCalculator(),
             new TrainingMoneyMakingCalculator(),
             market,
-            new MemoryTrainingPlanStore(),
+            new TrainingPlanPersistenceService(new MemoryTrainingPlanStore()),
             context,
             moneyMakerSelection);
         await allocatedViewModel.LoadAsync();
@@ -121,7 +121,7 @@ public sealed class XpPlannerViewModelTests
             new TrainingPlanCalculator(),
             new TrainingMoneyMakingCalculator(),
             market,
-            new MemoryTrainingPlanStore(),
+            new TrainingPlanPersistenceService(new MemoryTrainingPlanStore()),
             profileContext,
             new MoneyMakerSelectionContext());
 

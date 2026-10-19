@@ -486,7 +486,7 @@ public partial class XpPlannerViewModel : ObservableObject, IPageViewModel
     private readonly TrainingPlanCalculator calculator;
     private readonly TrainingMoneyMakingCalculator moneyMakingCalculator;
     private readonly IMarketDataService marketData;
-    private readonly ITrainingPlanStore store;
+    private readonly ITrainingPlanPersistenceService plans;
     private readonly ICurrentProfileContext profileContext;
     private readonly MoneyMakerSelectionContext moneyMakerSelection;
     private readonly ITrainingConfigurationDialogService? configurationDialogs;
@@ -506,6 +506,7 @@ public partial class XpPlannerViewModel : ObservableObject, IPageViewModel
     [ObservableProperty]
     private string pricingStatus = "Live prices";
     private CancellationTokenSource? saveCancellation;
+    private string? loadedProfileRsn;
     private IReadOnlyDictionary<int, ItemPrice> prices = new Dictionary<int, ItemPrice>();
     private bool initialized;
     private bool suppressRowChanges;
@@ -560,7 +561,7 @@ public partial class XpPlannerViewModel : ObservableObject, IPageViewModel
         TrainingPlanCalculator calculator,
         TrainingMoneyMakingCalculator moneyMakingCalculator,
         IMarketDataService marketData,
-        ITrainingPlanStore store,
+        ITrainingPlanPersistenceService plans,
         ICurrentProfileContext profileContext,
         MoneyMakerSelectionContext moneyMakerSelection,
         ITrainingConfigurationDialogService? configurationDialogs = null,
@@ -571,7 +572,7 @@ public partial class XpPlannerViewModel : ObservableObject, IPageViewModel
         this.calculator = calculator;
         this.moneyMakingCalculator = moneyMakingCalculator;
         this.marketData = marketData;
-        this.store = store;
+        this.plans = plans;
         this.profileContext = profileContext;
         this.moneyMakerSelection = moneyMakerSelection;
         this.configurationDialogs = configurationDialogs;
@@ -603,7 +604,7 @@ public partial class XpPlannerViewModel : ObservableObject, IPageViewModel
 
             var profile = profileContext.CurrentProfile
                           ?? throw new InvalidOperationException("Load a profile before opening the XP Planner.");
-            var preferences = await store.GetAsync(profile.Rsn, cancellationToken);
+            var preferences = await plans.GetAsync(profile.Rsn, cancellationToken);
             var itemIds = catalogue.Skills
                 .SelectMany(skill => skill.MarketItemIds)
                 .Distinct();
@@ -635,7 +636,12 @@ public partial class XpPlannerViewModel : ObservableObject, IPageViewModel
                 priceLoadFailed = true;
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!ReferenceEquals(profile, profileContext.CurrentProfile))
+                return;
+
             suppressRowChanges = true;
+            loadedProfileRsn = profile.Rsn;
             Rows.Clear();
             var profileSkills = profile.Skills.ToDictionary(skill => skill.Name, StringComparer.OrdinalIgnoreCase);
             foreach (var definition in catalogue.Skills)
@@ -801,7 +807,11 @@ public partial class XpPlannerViewModel : ObservableObject, IPageViewModel
     }
 
     [RelayCommand]
-    private Task SaveAsync(CancellationToken cancellationToken) => SaveNowAsync(cancellationToken);
+    private Task SaveAsync(CancellationToken cancellationToken)
+    {
+        QueueCurrentPlan();
+        return SaveNowAsync(cancellationToken);
+    }
 
     [RelayCommand]
     private void ResetMoneyMaker() => moneyMakerSelection.Clear();
@@ -944,6 +954,7 @@ public partial class XpPlannerViewModel : ObservableObject, IPageViewModel
 
     private void ScheduleSave()
     {
+        QueueCurrentPlan();
         saveCancellation?.Cancel();
         saveCancellation?.Dispose();
         saveCancellation = new CancellationTokenSource();
@@ -956,7 +967,8 @@ public partial class XpPlannerViewModel : ObservableObject, IPageViewModel
         try
         {
             await Task.Delay(600, cancellationToken);
-            await SaveNowAsync(cancellationToken);
+            // Rescheduling the debounce must not cancel a write that has already started.
+            await SaveNowAsync(CancellationToken.None);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -965,14 +977,10 @@ public partial class XpPlannerViewModel : ObservableObject, IPageViewModel
 
     private async Task SaveNowAsync(CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(profileContext.CurrentRsn))
-            return;
         try
         {
-            await store.SaveAsync(
-                profileContext.CurrentRsn,
-                Rows.Select(row => row.ToPreference()).ToArray(),
-                cancellationToken);
+            saveCancellation?.Cancel();
+            await plans.FlushAsync(cancellationToken);
             SaveStatus = $"Saved {DateTime.Now:t}";
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -983,6 +991,13 @@ public partial class XpPlannerViewModel : ObservableObject, IPageViewModel
         {
             SaveStatus = "Could not save changes";
         }
+    }
+
+    private void QueueCurrentPlan()
+    {
+        // Rows belong to the last successfully loaded profile, not whichever RSN is current now.
+        if (initialized && loadedProfileRsn is not null)
+            plans.QueueSave(loadedProfileRsn, Rows.Select(row => row.ToPreference()).ToArray());
     }
 
 }
