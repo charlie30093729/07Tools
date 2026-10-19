@@ -54,12 +54,14 @@ public sealed class WpfViewSmokeTests
                 new FakeHiscoreClient(),
                 new HiscoreParser(TimeProvider.System),
                 new MemoryProfilePreferenceStore("bottleo"));
+            var trainingStore = new MemoryTrainingPlanStore();
+            var plans = new TrainingPlanPersistenceService(trainingStore);
             var viewModel = new XpPlannerViewModel(
                 new MainEhpCatalogue(),
                 new TrainingPlanCalculator(),
                 new TrainingMoneyMakingCalculator(),
                 market,
-                new MemoryTrainingPlanStore(),
+                plans,
                 profileContext,
                 new MoneyMakerSelectionContext());
             viewModel.LoadAsync().GetAwaiter().GetResult();
@@ -135,6 +137,8 @@ public sealed class WpfViewSmokeTests
             };
             priceDialog.Show();
             priceDialog.UpdateLayout();
+            // Exercise rendering before closing, rather than leave its rendered callback queued.
+            priceDialog.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
             priceDialog.Close();
             window.Content = moneyView;
             moneyView.UpdateLayout();
@@ -184,10 +188,80 @@ public sealed class WpfViewSmokeTests
             Assert.That(favouritesList.Items[1], Is.SameAs(selectedRow), "dropping below the last row appends it");
             Assert.That(favouritesList.SelectedItem, Is.SameAs(selectedRow), "append drop retains selection");
             window.Close();
+
+            var shell = new ShellViewModel(new ProfileViewModel(profileContext),
+                new DashboardViewModel(new MemoryFavouriteStore(), market, new FakeItemIconService(), []),
+                favouritesViewModel, moneyViewModel, viewModel);
+            VerifyMainWindowWaitsForPlannerSave(shell, viewModel, plans, trainingStore);
         }
         finally
         {
             application?.Shutdown();
+        }
+    }
+
+    private static void VerifyMainWindowWaitsForPlannerSave(ShellViewModel shell,
+        XpPlannerViewModel planner, ITrainingPlanPersistenceService plans, MemoryTrainingPlanStore store)
+    {
+        var persistence = new GatedPersistence(plans);
+        var window = new RunescapeTools.Wpf.MainWindow(shell, persistence) { ShowInTaskbar = false };
+        var row = planner.Rows.Single(value => value.Skill == "Construction");
+        var editor = new System.Windows.Controls.TextBox();
+        editor.SetBinding(System.Windows.Controls.TextBox.TextProperty, new System.Windows.Data.Binding(
+            nameof(XpPlannerRowViewModel.TargetExperience))
+        {
+            Source = row,
+            Mode = System.Windows.Data.BindingMode.TwoWay,
+            UpdateSourceTrigger = System.Windows.Data.UpdateSourceTrigger.Explicit
+        });
+        window.Content = editor;
+        var closed = false;
+        window.Closed += (_, _) => closed = true;
+        window.Show();
+        window.UpdateLayout();
+        Assert.That(editor.Focus(), Is.True);
+        editor.Text = "150000000";
+        window.Close();
+
+        Assert.That(row.TargetExperience, Is.EqualTo(150_000_000), "closing commits the focused text edit");
+        Assert.That(closed, Is.False, "the main window stays alive while saving");
+        Assert.That(window.IsEnabled, Is.False, "edits are disabled while the closing snapshot is saved");
+        window.Close();
+        Assert.That(persistence.FlushCalls, Is.EqualTo(1), "repeated close requests share the active flush");
+        persistence.Release.SetResult();
+
+        var frame = new System.Windows.Threading.DispatcherFrame();
+        var deadline = DateTime.UtcNow.AddSeconds(5);
+        var timer = new System.Windows.Threading.DispatcherTimer(
+            TimeSpan.FromMilliseconds(10), System.Windows.Threading.DispatcherPriority.Background,
+            (_, _) => { if (closed || DateTime.UtcNow >= deadline) frame.Continue = false; }, window.Dispatcher);
+        try
+        {
+            System.Windows.Threading.Dispatcher.PushFrame(frame);
+        }
+        finally
+        {
+            timer.Stop();
+        }
+
+        Assert.That(closed, Is.True, "saving completes before the final close is approved");
+        var saved = store.GetAsync(planner.ProfileName).GetAwaiter().GetResult();
+        Assert.That(saved["Construction"].TargetExperience, Is.EqualTo(150_000_000));
+    }
+
+    private sealed class GatedPersistence(ITrainingPlanPersistenceService inner) : ITrainingPlanPersistenceService
+    {
+        public TaskCompletionSource Release { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public int FlushCalls { get; private set; }
+        public Task<IReadOnlyDictionary<string, TrainingSkillPreference>> GetAsync(
+            string rsn, CancellationToken cancellationToken = default) => inner.GetAsync(rsn, cancellationToken);
+        public void QueueSave(string rsn, IReadOnlyCollection<TrainingSkillPreference> preferences) =>
+            inner.QueueSave(rsn, preferences);
+        public async Task FlushAsync(CancellationToken cancellationToken = default)
+        {
+            FlushCalls++;
+            await Release.Task.WaitAsync(cancellationToken);
+            await inner.FlushAsync(cancellationToken);
         }
     }
 }

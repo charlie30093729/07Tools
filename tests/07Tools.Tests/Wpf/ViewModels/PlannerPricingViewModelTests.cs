@@ -86,7 +86,7 @@ public sealed class PlannerPricingViewModelTests
              new(2, "Output", 4, ItemFlowDirection.Output, QuantityBasis.PerAction)]);
         selection.Select("test", "Test alt", 999999, 5, false, method);
         var vm = new XpPlannerViewModel(new PrayerCatalogue(), new TrainingPlanCalculator(),
-            new TrainingMoneyMakingCalculator(), market, new MemoryTrainingPlanStore(),
+            new TrainingMoneyMakingCalculator(), market, new TrainingPlanPersistenceService(new MemoryTrainingPlanStore()),
             new CurrentProfileContext(new FakeHiscoreClient(), new HiscoreParser(TimeProvider.System),
                 new MemoryProfilePreferenceStore("bottleo")), selection, plannerPricing: service);
         await vm.LoadAsync();
@@ -112,7 +112,7 @@ public sealed class PlannerPricingViewModelTests
 
     private static XpPlannerViewModel Create(IPlannerPricingService pricing) => new(
         new MainEhpCatalogue(), new TrainingPlanCalculator(), new TrainingMoneyMakingCalculator(),
-        new FakeMarketDataService(), new MemoryTrainingPlanStore(),
+        new FakeMarketDataService(), new TrainingPlanPersistenceService(new MemoryTrainingPlanStore()),
         new CurrentProfileContext(new FakeHiscoreClient(), new HiscoreParser(TimeProvider.System),
             new MemoryProfilePreferenceStore("bottleo")), new MoneyMakerSelectionContext(), plannerPricing: pricing);
 

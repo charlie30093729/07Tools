@@ -90,6 +90,7 @@ public static class ServiceCollectionExtensions
         {
             services.AddSingleton(trainingPlanOptions);
             services.AddSingleton<ITrainingPlanStore, JsonTrainingPlanStore>();
+            services.AddSingleton<ITrainingPlanPersistenceService, TrainingPlanPersistenceService>();
         }
 
         if (moneyMakingPreferenceOptions is not null)

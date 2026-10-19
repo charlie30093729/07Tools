@@ -13,7 +13,7 @@ public sealed class PrayerOfferingPlannerTests
         var context = new CurrentProfileContext(new FakeHiscoreClient(),
             new HiscoreParser(TimeProvider.System), new MemoryProfilePreferenceStore("bottleo"));
         var vm = new XpPlannerViewModel(new PrayerOnlyCatalogue(), new TrainingPlanCalculator(),
-            new TrainingMoneyMakingCalculator(), market, new MemoryTrainingPlanStore(), context,
+            new TrainingMoneyMakingCalculator(), market, new TrainingPlanPersistenceService(new MemoryTrainingPlanStore()), context,
             new MoneyMakerSelectionContext());
         await vm.LoadAsync();
         var row = vm.Rows.Single();
@@ -33,7 +33,7 @@ public sealed class PrayerOfferingPlannerTests
             new HiscoreParser(TimeProvider.System), new MemoryProfilePreferenceStore("bottleo"));
         var vm = new XpPlannerViewModel(new MainEhpCatalogue(), new TrainingPlanCalculator(),
             new TrainingMoneyMakingCalculator(), new FakeMarketDataService { Latest = Prices() },
-            new MemoryTrainingPlanStore(), context, new MoneyMakerSelectionContext());
+            new TrainingPlanPersistenceService(new MemoryTrainingPlanStore()), context, new MoneyMakerSelectionContext());
         await vm.LoadAsync();
         var originalProfile = context.CurrentProfile;
         foreach (var row in vm.Rows)
