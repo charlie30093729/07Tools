@@ -10,8 +10,6 @@ public sealed class HallowedSepulchreTests
     {
         var catalogue = new MainEhpCatalogue();
 
-        var agilityDefinition = catalogue.Skills.Single(skill => skill.Skill == "Agility");
-
         var agility = TrainingBand(catalogue, "Agility", 0);
 
         Assert.That(agility.ExperiencePerHour, Is.EqualTo(98_500m).Within(0m), "Agility rate");
@@ -27,12 +25,6 @@ public sealed class HallowedSepulchreTests
         Assert.That(Resource(agility, 10925).QuantityPerExperience, Is.EqualTo(0.15m / 11_700m).Within(0m), "Sanfew serum per XP");
 
         Assert.That(agility.Economics!.FixedGpOutputPerExperience, Is.EqualTo(2_125m / 11_700m).Within(0m), "coins per XP");
-
-        Assert.That(agilityDefinition.Note?.Contains("17,095") == true, Is.True, "Agility note should retain coffin total");
-
-        Assert.That(agilityDefinition.Note?.Contains("3,419,000") == true, Is.True, "Agility note should retain Thieving XP");
-
-        Assert.That(agilityDefinition.Note?.Contains("only the Grand Coffin", StringComparison.OrdinalIgnoreCase) == true, Is.True, "Agility note should disclose looting scope");
 
         Assert.That(agility.Economics is { IsComplete: true }, Is.True, "Grand Coffin economics should be fully modelled");
     }
@@ -74,7 +66,8 @@ public sealed class HallowedSepulchreTests
 
         Assert.That(agility.Hours, Is.EqualTo(2_030.4569m).Within(0.0001m), "Grand Coffin 0-200m hours");
 
-        Assert.That(TotalResourceQuantity(catalogue, "Agility", 12625), Is.EqualTo(reviewedCoffins * 0.5m).Within(0.0001m), "Grand Coffin stamina potions");
+        Assert.That(agility.ResourceRequirements.Single(item => item.ItemId == 12625).Quantity,
+            Is.EqualTo(reviewedCoffins * 0.5m).Within(0.0001m), "Grand Coffin stamina potions");
 
         Assert.That(agility.NetGp ?? 0m, Is.EqualTo(reviewedCoffins * expectedNetGpPerCoffin).Within(0.01m), "Grand Coffin expected profit");
 

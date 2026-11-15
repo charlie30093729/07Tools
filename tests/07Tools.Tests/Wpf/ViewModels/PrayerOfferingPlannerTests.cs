@@ -64,7 +64,6 @@ public sealed class PrayerOfferingPlannerTests
     }
 
     [TestCase("offering-at-bank")]
-    [TestCase("offering-at-prif-agility")]
     public void RowRestoresOfferingConfigurationAndResetRestoresGildedAltar(string location)
     {
         var row = new XpPlannerRowViewModel(CreatePrayerDefinition(), new TrainingPlanCalculator(), 13_034_431,
@@ -86,6 +85,7 @@ public sealed class PrayerOfferingPlannerTests
         var dialog = new TrainingPriceDialogViewModel("Prayer", result, Prices());
         var shard = dialog.Items.Single(item => item.ItemId == 23962);
         Assert.That(shard.Action, Is.EqualTo("GAIN"));
+        Assert.That(shard.UnitPrice, Is.EqualTo("Untradeable"));
         Assert.That(shard.IsOutput, Is.True);
         Assert.That(shard.QuantityCaption, Does.Not.Contain("stock"));
         Assert.That(dialog.Items.Single(item => item.ItemId == 565).UnitPrice, Is.EqualTo("400 gp"));

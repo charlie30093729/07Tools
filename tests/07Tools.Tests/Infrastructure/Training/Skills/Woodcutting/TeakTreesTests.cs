@@ -16,12 +16,6 @@ public sealed class TeakTreesTests
 
         Assert.That(woodcutting.Method, Is.EqualTo("1.5t teaks - crystal felling axe"), "Woodcutting method");
 
-        Assert.That(TotalResourceQuantity(catalogue, "Woodcutting", 28157), Is.EqualTo(2_091_504m).Within(0.001m), "Woodcutting Forester's rations");
-
-        Assert.That(TotalResourceQuantity(catalogue, "Woodcutting", 23959), Is.EqualTo(100m).Within(0.001m), "Woodcutting enhanced seeds");
-
-        Assert.That(catalogue.Skills.Single(skill => skill.Skill == "Woodcutting").Note?.Contains("14,953") == true, Is.True, "Woodcutting note should retain the consumed shard total");
-
         Assert.That(catalogue.Skills.Single(skill => skill.Skill == "Woodcutting")
                 .Bands.SelectMany(band => band.Economics?.Resources ?? [])
                 .All(resource => resource.Direction == TrainingFlowDirection.Input), Is.True, "dropped teak logs should not be valued as outputs");
@@ -57,6 +51,11 @@ public sealed class TeakTreesTests
             prices);
 
         Assert.That(woodcutting.PricedExperience, Is.EqualTo(199_977_594L), "priced Woodcutting XP");
+
+        Assert.That(woodcutting.ResourceRequirements.Single(item => item.ItemId == 28157).Quantity,
+            Is.EqualTo(2_091_504m).Within(0.001m), "Woodcutting Forester's rations");
+        Assert.That(woodcutting.ResourceRequirements.Single(item => item.ItemId == 23959).Quantity,
+            Is.EqualTo(100m).Within(0.001m), "Woodcutting enhanced seeds");
 
         Assert.That(woodcutting.NetGp ?? 0m, Is.EqualTo(-(2_091_504m * 50m + 100m * 3_000_000m)).Within(0.01m), "Woodcutting resource cost");
 

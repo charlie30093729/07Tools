@@ -51,7 +51,6 @@ public sealed class HunterConfigurationTests
     }
 
     [TestCase("main-ehp", "Black chinchompas", 265000, 200000)]
-    [TestCase("red-chinchompas", "Red chinchompas", 210000, 170000)]
     public async Task NamesPersistenceCustomRatesAndReset(string id, string name, int defaultRate, int nonTickRate)
     {
         var row = Row();

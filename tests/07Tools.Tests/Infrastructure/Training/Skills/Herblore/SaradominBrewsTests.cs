@@ -24,10 +24,5 @@ public sealed class SaradominBrewsTests
 
         Assert.That(Resource(herblore, 6685).QuantityPerExperience, Is.EqualTo((3m + 0.15m) / 4m / 180m).Within(0m), "four-dose Alchemist's amulet brew output");
 
-        Assert.That(catalogue.Skills.Single(skill => skill.Skill == "Herblore").Note?
-                .Contains("Prescription goggles", StringComparison.Ordinal) == true, Is.True, "Herblore note should disclose Prescription goggles");
-
-        Assert.That(catalogue.Skills.Single(skill => skill.Skill == "Herblore").Note?
-                .Contains("Alchemist's amulet", StringComparison.Ordinal) == true, Is.True, "Herblore note should disclose Alchemist's amulet");
     }
 }

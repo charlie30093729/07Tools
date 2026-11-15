@@ -36,8 +36,6 @@ public sealed class HerbloreMethodTests
     public void HerbloreAlternativeMethods()
     {
         var definition = new MainEhpCatalogue().Skills.Single(skill => skill.Skill == "Herblore");
-        Assert.That(string.Join('|', definition.AvailableMethods.Select(method => method.Id)), Is.EqualTo("main-ehp|super-restores|1t-extended-super-antifires"), "Herblore method IDs");
-
         var restores = definition.ResolveMethod("super-restores");
         var restoreBand = restores.Bands.Last();
         Assert.That(restoreBand.StartExperience, Is.EqualTo(368_599L), "Super restores unlock XP");

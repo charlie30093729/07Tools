@@ -1,5 +1,9 @@
 # NUnit migration map
 
+Historical migration record, not a requirement to retain every original test or assertion.
+The later [behavior-focused pruning audit](../../docs/TEST_SUITE_PRUNING.md) deliberately
+removes redundant checks and scaffolding. Counts below describe the original migration.
+
 Baseline: `61b0dc8` (`main` after Construction PR #62), formerly `Program.cs`.
 
 All 69 registered legacy scenarios are represented by 101 discovered NUnit tests. Syntax-level comparison verified preservation of all 871 assertion call sites, including expected/actual expressions, messages, decimal tolerances, and derived-exception matching. These are call-site counts, not runtime assertion counts or a code-coverage percentage.
@@ -23,7 +27,7 @@ The initial one-to-one extraction passed 69/69 before the cross-skill scenarios 
 | `FavouriteWarmup` | 2 | [FavouriteWarmup](Application/Favourites/FavouriteHistoryWarmupTests.cs) |
 | `WikiClientRetries` | 2 | [WikiClientRetries](Infrastructure/Http/OsrsWikiPriceClientTests.cs) |
 | `JsonStoreSeedsSortsAndDeduplicates` | 5 | [JsonStoreSeedsSortsAndDeduplicates](Infrastructure/Persistence/JsonFavouriteStoreTests.cs) |
-| `JsonStoreDoesNotOverwrite` | 2 | [JsonStoreDoesNotOverwrite](Infrastructure/Persistence/JsonFavouriteStoreTests.cs) |
+| `JsonStoreDoesNotOverwrite` | 2 | Now covered by [ExistingArrayOrderLoadsWithoutSchemaMigrationOrOverwrite](Infrastructure/Persistence/JsonFavouriteStoreTests.cs) |
 | `HiscoreParserMapsSkills` | 10 | [HiscoreParserMapsSkills](Infrastructure/Profiles/HiscoreParserTests.cs) |
 | `ProfileSkillIconMapping` | 4 | [ProfileSkillIconMapping](Core/Profiles/ProfileSkillIconTests.cs) |
 | `HiscoreParserRejectsInvalidResponses` | 2 | [HiscoreParserRejectsInvalidResponses](Infrastructure/Profiles/HiscoreParserTests.cs) |

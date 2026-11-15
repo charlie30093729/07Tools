@@ -10,10 +10,6 @@ public sealed class OakDungeonDoorsTests
     {
         var catalogue = new MainEhpCatalogue();
 
-        var calculator = new TrainingPlanCalculator();
-
-        var emptyPrices = new Dictionary<int, ItemPrice>();
-
         var construction = catalogue.Skills.Single(skill => skill.Skill == "Construction");
 
         var doors = construction.ResolveMethod("oak-dungeon-doors").Bands.Last();

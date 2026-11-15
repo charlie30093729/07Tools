@@ -10,10 +10,6 @@ public sealed class AdamantDartsTests
     {
         var catalogue = new MainEhpCatalogue();
 
-        var calculator = new TrainingPlanCalculator();
-
-        var emptyPrices = new Dictionary<int, ItemPrice>();
-
         var fletching = catalogue.Skills.Single(skill => skill.Skill == "Fletching");
 
         var adamantDarts = fletching.ResolveMethod("adamant-darts").Bands.Last();

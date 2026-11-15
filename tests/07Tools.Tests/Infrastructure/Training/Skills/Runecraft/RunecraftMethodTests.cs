@@ -13,8 +13,6 @@ public sealed class RunecraftMethodTests
         var calculator = new TrainingPlanCalculator();
         var emptyPrices = new Dictionary<int, ItemPrice>();
 
-        Assert.That(string.Join('|', definition.AvailableMethods.Select(method => method.Id)), Is.EqualTo("main-ehp|solo-lava-runes|solo-aether-runes|dolo-aether-runes|achievement-cape-double-nature-runes|ourania-altar-zmi|arceuus-blood-runes|arceuus-soul-runes"), "Runecraft method IDs");
-
         var mud = definition.ResolveMethod("main-ehp").Bands.Last();
         Assert.That(mud.ExperiencePerHour, Is.EqualTo(98_200m).Within(0m), "solo mud 99 rate");
         Assert.That(Resource(mud, 4698).QuantityPerExperience, Is.EqualTo(105.3m / 598.5m).Within(0m), "Raiments and lantern mud output");

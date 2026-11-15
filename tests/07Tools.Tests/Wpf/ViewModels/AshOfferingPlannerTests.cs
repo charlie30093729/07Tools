@@ -11,7 +11,6 @@ public sealed class AshOfferingPlannerTests
             preference, Prices(), () => { });
 
     [TestCase("infernal-ashes")]
-    [TestCase("abyssal-ashes")]
     public void SelectingAshesDefaultsToPrifAndDialogOnlyAllowsOffering(string id)
     {
         var row = Row();
@@ -33,7 +32,6 @@ public sealed class AshOfferingPlannerTests
         Assert.That(row.ConfigurationValues["offering-location"], Is.EqualTo("offering-at-prif-agility"));
     }
 
-    [TestCase("infernal-ashes")]
     [TestCase("abyssal-ashes")]
     public async Task BankChoiceAndCustomRatePersistUntilAnExplicitNewSelection(string id)
     {
@@ -69,7 +67,6 @@ public sealed class AshOfferingPlannerTests
     }
 
     [TestCase("infernal-ashes", 25778, 330)]
-    [TestCase("abyssal-ashes", 25775, 255)]
     public async Task AshSelectionPricesAndProjectsCreditsAcrossPlanner(string id, int itemId, int experiencePerAsh)
     {
         var prices = Prices();

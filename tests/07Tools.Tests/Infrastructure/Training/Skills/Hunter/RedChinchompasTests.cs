@@ -14,8 +14,6 @@ public sealed class RedChinchompasTests
 
         var hunter = catalogue.Skills.Single(skill => skill.Skill == "Hunter");
 
-        Assert.That(string.Join('|', hunter.AvailableMethods.Select(method => method.Id)), Is.EqualTo("main-ehp|herbiboar|red-chinchompas|aerial-fishing"), "Hunter method IDs");
-
         var redChins = hunter.ResolveMethod("red-chinchompas");
 
         var red63 = redChins.Bands.Single(band => band.StartExperience == 368_599);

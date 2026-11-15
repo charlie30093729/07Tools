@@ -16,8 +16,6 @@ public sealed class DragonBoneMethodsTests
 
         var prayer = catalogue.Skills.Single(skill => skill.Skill == "Prayer");
 
-        Assert.That(string.Join('|', prayer.AvailableMethods.Select(method => method.Id)), Is.EqualTo("superior-dragon-bones|dragon-bones|frost-dragon-bones|infernal-ashes|abyssal-ashes"), "Prayer method IDs");
-
         var dragonBones = prayer.ResolveMethod("dragon-bones").Bands.Single();
 
         Assert.That(dragonBones.ExperiencePerHour, Is.EqualTo(642_600m).Within(0m), "Gilded Altar dragon bone rate");

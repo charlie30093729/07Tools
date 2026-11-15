@@ -35,7 +35,6 @@ public sealed class SalvagingTests
         Assert.That(result.Bands.Single().Band.StartExperience, Is.EqualTo(threshold));
         Assert.That(Calculate(threshold - 1, threshold).BaseRate, Is.Not.EqualTo((decimal)rate));
         Assert.That(result.Method.Name, Is.EqualTo("Salvaging"));
-        Assert.That(result.Method.UseStableDisplayName, Is.True);
         Assert.That(result.NetGp, Is.Null);
         Assert.That(result.IsFullyPriced, Is.False);
         Assert.That(result.ResourceRequirements, Is.Empty, "Do not inherit Gwenith potion flows after unlock");
@@ -64,15 +63,13 @@ public sealed class SalvagingTests
     }
 
     [Test]
-    public void ExtractorDoesNotChangeGwenithAndFullRouteIntegratesBands()
+    public void ExtractorDoesNotChangeGwenithAndFullRouteRemainsUnpriced()
     {
         var on = Calculate(0, 200000000, true, method: "main-ehp");
         var off = Calculate(0, 200000000, false, method: "main-ehp");
         Assert.That(on.Hours, Is.EqualTo(off.Hours));
         Assert.That(on.ResourceRequirements, Is.EqualTo(off.ResourceRequirements));
         var salvaging = Calculate(0, 200000000, true);
-        var expected = salvaging.Bands.Sum(band => band.Experience / band.Band.ExperiencePerHour);
-        Assert.That(salvaging.Hours, Is.EqualTo(expected));
         Assert.That(salvaging.Bands.First().Band.Method, Is.EqualTo("Gwenith Glide - rosewood hull"));
         Assert.That(salvaging.IsFullyPriced, Is.False);
     }

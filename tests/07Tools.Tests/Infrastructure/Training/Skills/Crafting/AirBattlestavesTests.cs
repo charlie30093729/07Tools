@@ -10,10 +10,6 @@ public sealed class AirBattlestavesTests
     {
         var catalogue = new MainEhpCatalogue();
 
-        var calculator = new TrainingPlanCalculator();
-
-        var emptyPrices = new Dictionary<int, ItemPrice>();
-
         var crafting = catalogue.Skills.Single(skill => skill.Skill == "Crafting");
 
         var airStaves = crafting.ResolveMethod("air-battlestaves").Bands.Last();

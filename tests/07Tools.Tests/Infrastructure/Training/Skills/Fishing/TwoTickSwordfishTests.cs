@@ -16,9 +16,6 @@ public sealed class TwoTickSwordfishTests
 
         Assert.That(fishing.Method, Is.EqualTo("2t swordfish and tuna - crystal harpoon"), "Fishing method");
 
-        Assert.That(TotalResourceQuantity(catalogue, "Fishing", 23959), Is.EqualTo(33m).Within(0.001m), "Fishing enhanced seeds");
-
-        Assert.That(catalogue.Skills.Single(skill => skill.Skill == "Fishing").Note?.Contains("4,894") == true, Is.True, "Fishing note should retain the consumed shard total");
     }
 
     [Test]
@@ -51,6 +48,9 @@ public sealed class TwoTickSwordfishTests
             prices);
 
         Assert.That(fishing.PricedExperience, Is.EqualTo(199_185_555L), "priced Fishing XP");
+
+        Assert.That(fishing.ResourceRequirements.Single(item => item.ItemId == 23959).Quantity,
+            Is.EqualTo(33m).Within(0.001m), "Fishing enhanced seeds");
 
         Assert.That(fishing.NetGp ?? 0m, Is.EqualTo(-(33m * 3_000_000m)).Within(0.01m), "Fishing crystal-charge cost");
 

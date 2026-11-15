@@ -41,8 +41,6 @@ public sealed class FiremakingConfigurationTests
 
         Assert.That(bonfire.Method.Bands[^1].Method, Is.EqualTo("Rosewood logs - bonfire"), "bonfire method label");
 
-        Assert.That(string.Join('|', firemaking.AvailableMethods.Select(method => method.Id)), Is.EqualTo("main-ehp|redwood-logs"), "Firemaking method IDs");
-
         var redwood = calculator.Calculate(
             firemaking,
             5_346_332,

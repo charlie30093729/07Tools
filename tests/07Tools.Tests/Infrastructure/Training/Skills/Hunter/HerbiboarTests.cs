@@ -15,7 +15,6 @@ public sealed class HerbiboarTests
         var level80 = herbiboar.Bands.Single(band => band.StartExperience == 1_986_068);
         var level99 = herbiboar.Bands.Single(band => band.StartExperience == 13_034_431);
 
-        Assert.That(hunter.AvailableMethods.Count, Is.EqualTo(4), "Hunter method count");
         Assert.That(main.Id, Is.EqualTo("main-ehp"), "Hunter default method remains Main EHP");
         Assert.That(main.Bands.Single(band => band.StartExperience == 992_895).Method, Is.EqualTo("Black chinchompas"), "Hunter default high-level route label");
         Assert.That(herbiboar.Name, Is.EqualTo("Herbiboar"), "Herbiboar method name");

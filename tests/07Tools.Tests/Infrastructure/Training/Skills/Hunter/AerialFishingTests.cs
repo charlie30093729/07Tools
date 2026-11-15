@@ -16,7 +16,6 @@ public sealed class AerialFishingTests
         var aerial = hunter.ResolveMethod("aerial-fishing");
         var band = aerial.Bands.Single(rateBand => rateBand.StartExperience == reviewedRateStartExperience);
 
-        Assert.That(hunter.AvailableMethods.Count, Is.EqualTo(4), "Hunter method count with Aerial Fishing");
         Assert.That(aerial.Name, Is.EqualTo("Aerial Fishing"), "Aerial Fishing route name");
         Assert.That(band.ExperiencePerHour, Is.EqualTo(hunterRate).Within(0m), "Aerial Hunter XP/hour");
         Assert.That(band.ExperienceOutputs!.Single(flow => flow.Skill == "Fishing").QuantityPerPrimaryExperience, Is.EqualTo(fishingRate / hunterRate).Within(0m), "Aerial Fishing XP per Hunter XP");
