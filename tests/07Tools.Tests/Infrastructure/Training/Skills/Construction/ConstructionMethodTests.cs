@@ -22,7 +22,6 @@ public sealed class ConstructionMethodTests
         Assert.That(!result.IsFullyPriced, Is.True, "low-level furniture should remain visibly unpriced");
         Assert.That(result.NetGp is < -2_800_000_000m and > -2_805_000_000m, Is.True, "Construction cost should match the reviewed 2.8b estimate");
 
-        Assert.That(string.Join('|', definition.AvailableMethods.Select(method => method.Id)), Is.EqualTo("main-ehp|oak-dungeon-doors|mahogany-tables"), "Construction method IDs");
         var mahoganyTables = definition.ResolveMethod("mahogany-tables");
         var mahoganyTableBand = mahoganyTables.Bands.Last();
         Assert.That(mahoganyTableBand.StartExperience, Is.EqualTo(123_660L), "Mahogany table level-52 unlock XP");

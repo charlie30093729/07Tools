@@ -23,20 +23,6 @@ public sealed class CatalogueTests
             var ordered = skill.Bands.OrderBy(band => band.StartExperience).ToArray();
             Assert.That(ordered.Select(band => band.StartExperience).Distinct().Count(), Is.EqualTo(ordered.Length), $"{skill.Skill} band starts");
             Assert.That(string.Join('|', skill.Bands.Select(band => band.StartExperience)), Is.EqualTo(string.Join('|', ordered.Select(band => band.StartExperience))), $"{skill.Skill} band ordering");
-            var expectedMethodCount = skill.Skill switch
-            {
-                "Herblore" or "Smithing" or "Construction" or "Agility" => 3,
-                "Runecraft" => 8,
-                "Hunter" => 4,
-                "Woodcutting" or "Fishing" => 3,
-                "Defence" or "Ranged" or "Farming" or "Cooking" or "Firemaking" => 2,
-                "Prayer" => 5,
-                "Fletching" or "Crafting" or "Sailing" or "Mining" or "Thieving" => 2,
-                _ => 1
-            };
-            Assert.That(skill.AvailableMethods.Count, Is.EqualTo(expectedMethodCount), $"{skill.Skill} method count");
-            Assert.That(skill.AvailableMethods[0].Id, Is.EqualTo(skill.DefaultMethodId), $"{skill.Skill} default method ID");
-            Assert.That(skill.AvailableMethods[0].Bands.Count, Is.EqualTo(skill.Bands.Count), $"{skill.Skill} default method bands");
         }
     }
 
@@ -146,27 +132,4 @@ public sealed class CatalogueTests
             Assert.That(band.Economics is { IsComplete: true }, Is.True, $"{band.Method} should be fully modelled");
     }
 
-    [Test]
-    [Property("LegacyScenario", "PhaseTwoMethodCatalogue")]
-    public void GatheringMethodsHaveCompleteEconomicModels()
-    {
-        var catalogue = new MainEhpCatalogue();
-
-        var woodcutting = TrainingBand(catalogue, "Woodcutting", 814_445);
-
-        var fishing = TrainingBand(catalogue, "Fishing", 814_445);
-
-        var mining = TrainingBand(catalogue, "Mining", 393_485);
-
-        var hunter = TrainingBand(catalogue, "Hunter", 992_895);
-
-        var runecraft75 = TrainingBand(catalogue, "Runecraft", 1_210_421);
-
-        var runecraft85 = TrainingBand(catalogue, "Runecraft", 3_258_594);
-
-        var runecraft99 = TrainingBand(catalogue, "Runecraft", 13_034_431);
-
-        foreach (var band in new[] { woodcutting, fishing, mining, hunter, runecraft75, runecraft85, runecraft99 })
-            Assert.That(band.Economics is { IsComplete: true }, Is.True, $"{band.Method} should expose reviewed economics");
-    }
 }

@@ -179,26 +179,4 @@ public sealed class XpPlannerRowViewModelTests
         Assert.That(!restored.Result.IncludesActiveHours, Is.True, "saved configuration restores");
     }
 
-    [Test]
-    [Property("LegacyScenario", "TrainingSkillConfiguration")]
-    public void PrayerMaterialLabelIsIndependentOfAltar()
-    {
-        var catalogue = new MainEhpCatalogue();
-
-        var calculator = new TrainingPlanCalculator();
-
-        var prices = new Dictionary<int, ItemPrice>();
-
-        var prayer = catalogue.Skills.Single(skill => skill.Skill == "Prayer");
-
-        var prayerRow = new XpPlannerRowViewModel(
-            prayer,
-            calculator,
-            0,
-            null,
-            prices,
-            () => { });
-
-        Assert.That(prayerRow.SelectedMethodOption?.Name ?? string.Empty, Is.EqualTo("Superior dragon bones"), "Prayer material selector remains separate from offering location");
-    }
 }

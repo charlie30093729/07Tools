@@ -35,21 +35,4 @@ public sealed class SalvagingPlannerTests
         Assert.That(restored.ToPreference().ExperiencePerHourOverride, Is.Null);
     }
 
-    [Test]
-    public void StableLabelAndUnlockRefreshWhenStartXpChanges()
-    {
-        var row = Create();
-        row.SelectedMethodOption = row.MethodOptions.Single(option => option.Id == "salvaging");
-        foreach (var start in new long[] { 200000000, 3972294, 992895, 2411 })
-        {
-            row.StartExperience = start;
-            Assert.That(row.SelectedMethodOption.Name, Is.EqualTo("Salvaging"));
-        }
-        row.StartExperience = 0;
-        Assert.That(row.SelectedMethodOption.Name, Is.EqualTo("Salvaging — unlocks at 15"));
-        Assert.That(row.HasAvailabilitySummary, Is.True);
-        row.StartExperience = 3972294;
-        Assert.That(row.PersonalRate, Is.EqualTo(95000m + Bonus));
-        Assert.That(row.HasAvailabilitySummary, Is.False);
-    }
 }

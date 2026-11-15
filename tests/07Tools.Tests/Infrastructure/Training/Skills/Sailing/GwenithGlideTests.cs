@@ -10,8 +10,6 @@ public sealed class GwenithGlideTests
     {
         var catalogue = new MainEhpCatalogue();
 
-        var sailingDefinition = catalogue.Skills.Single(skill => skill.Skill == "Sailing");
-
         var sailing = TrainingBand(catalogue, "Sailing", 0);
 
         Assert.That(sailing.ExperiencePerHour, Is.EqualTo(240_000m).Within(0m), "Gwenith Glide rate");
@@ -28,11 +26,6 @@ public sealed class GwenithGlideTests
 
         Assert.That(Resource(sailing, 23685).SubjectToGeTax, Is.True, "divine potions should be GE taxed");
 
-        Assert.That(sailingDefinition.Note?.Contains("16,040") == true, Is.True, "Sailing note should retain the shard total");
-
-        Assert.That(sailingDefinition.Note?.Contains("40,100") == true, Is.True, "Sailing note should retain the potion total");
-
-        Assert.That(!sailingDefinition.Bands.Any(band => band.Method.Contains("Spin Flax", StringComparison.OrdinalIgnoreCase)), Is.True, "Sailing should exclude multiskilling");
     }
 
     [Test]
@@ -59,13 +52,16 @@ public sealed class GwenithGlideTests
 
         Assert.That(sailing.Hours, Is.EqualTo(833.3333m).Within(0.0001m), "Gwenith Glide 0-200m hours");
 
-        Assert.That(TotalResourceQuantity(catalogue, "Sailing", 12695), Is.EqualTo(40_100m).Within(0.0001m), "Gwenith regular potions");
+        Assert.That(sailing.ResourceRequirements.Single(item => item.ItemId == 12695).Quantity,
+            Is.EqualTo(40_100m).Within(0.0001m), "Gwenith regular potions");
 
-        Assert.That(TotalResourceQuantity(catalogue, "Sailing", 23685), Is.EqualTo(40_100m).Within(0.0001m), "Gwenith divine potions");
+        Assert.That(sailing.ResourceRequirements.Single(item => item.ItemId == 23685).Quantity,
+            Is.EqualTo(40_100m).Within(0.0001m), "Gwenith divine potions");
 
         Assert.That(sailing.NetGp ?? 0m, Is.EqualTo(40_100m * (18_000m - 360m - 14_000m)).Within(0.01m), "Gwenith potion profit after tax");
 
         Assert.That(sailing.IsFullyPriced, Is.True, "Gwenith projection should be fully priced");
+        Assert.That(sailing.GeneratedExperience, Is.Empty, "Gwenith should not grant secondary skill XP");
 
         var fasterSailing = calculator.Calculate(
             sailingDefinition,

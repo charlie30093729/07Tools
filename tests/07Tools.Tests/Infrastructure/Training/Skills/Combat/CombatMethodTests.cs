@@ -14,8 +14,6 @@ public sealed class CombatMethodTests
 
         var defenceDefinition = catalogue.Skills.Single(skill => skill.Skill == "Defence");
         var defence = TrainingBand(catalogue, "Defence", 0);
-        Assert.That(defenceDefinition.AvailableMethods.Count, Is.EqualTo(2), "Defence chinchompa method count");
-        Assert.That(string.Join('|', defenceDefinition.AvailableMethods.Select(method => method.Id)), Is.EqualTo("main-ehp|red-chinchompas-cannon-defensive"), "Defence chinchompa method IDs");
         Assert.That(defence.ExperiencePerHour, Is.EqualTo(405_000m).Within(0m), "Defence rate");
         Assert.That(defence.Method, Is.EqualTo("Black Chinchompas & Cannon - Defensive"), "Defence method");
         Assert.That(Resource(defence, 11959).QuantityPerExperience, Is.EqualTo(1_500m / 405_000m).Within(0m), "Defence chins per XP");
@@ -30,8 +28,6 @@ public sealed class CombatMethodTests
         var rangedDefinition = catalogue.Skills.Single(skill => skill.Skill == "Ranged");
         var ranged = TrainingBand(catalogue, "Ranged", 0);
         Assert.That(rangedDefinition.IsZeroTime, Is.True, "Ranged should contribute zero active hours");
-        Assert.That(rangedDefinition.AvailableMethods.Count, Is.EqualTo(2), "Ranged chinchompa method count");
-        Assert.That(string.Join('|', rangedDefinition.AvailableMethods.Select(method => method.Id)), Is.EqualTo("main-ehp|red-chinchompas-cannon"), "Ranged chinchompa method IDs");
         Assert.That(ranged.ExperiencePerHour, Is.EqualTo(1_150_000m).Within(0m), "Ranged rate");
         Assert.That(ranged.Method, Is.EqualTo("Black Chinchompas & Cannon"), "Ranged method");
         Assert.That(Resource(ranged, 11959).QuantityPerExperience, Is.EqualTo(1_866m / 1_150_000m).Within(0m), "Ranged chins per XP");

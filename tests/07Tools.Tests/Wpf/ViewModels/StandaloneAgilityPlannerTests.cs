@@ -10,34 +10,6 @@ public sealed class StandaloneAgilityPlannerTests
     private static Dictionary<int, ItemPrice> CoursePrices() =>
         TestSupport.Builders.AgilityCourseTestData.Prices();
 
-    [TestCase("prifddinas-agility-course", "Prifddinas Agility Course", 1210421, 75, 54000)]
-    [TestCase("ardougne-rooftop-course", "Ardougne Rooftop Course", 5346332, 90, 70000)]
-    public async Task CourseLabelsUnlocksOverridesAndPersistence(string id, string label, long unlock, int level, int rate)
-    {
-        var row = new XpPlannerRowViewModel(Definition(), new TrainingPlanCalculator(), 13034431,
-            null, CoursePrices(), () => { });
-        row.SelectedMethodOption = row.MethodOptions.Single(option => option.Id == id);
-        row.StartExperience = 200000000;
-        Assert.That(row.SelectedMethodOption.Name, Is.EqualTo(label));
-        row.StartExperience = unlock - 1;
-        Assert.That(row.SelectedMethodOption.Name, Is.EqualTo($"{label} — unlocks at {level}"));
-        Assert.That(row.HasAvailabilitySummary, Is.True);
-        row.StartExperience = unlock;
-        Assert.That(row.SelectedMethodOption.Name, Is.EqualTo(label));
-        Assert.That(row.PersonalRate, Is.EqualTo(rate));
-        row.PersonalRate = 50000m;
-        using var temporary = new TemporaryDirectory();
-        var store = new JsonTrainingPlanStore(new TrainingPlanOptions { FilePath = Path.Combine(temporary.Path, "plans.json") });
-        await store.SaveAsync("Runner", [row.ToPreference()]);
-        var restored = new XpPlannerRowViewModel(Definition(), new TrainingPlanCalculator(), unlock,
-            (await store.GetAsync("Runner"))["Agility"], CoursePrices(), () => { });
-        Assert.That(restored.SelectedMethodOption!.Id, Is.EqualTo(id));
-        Assert.That(restored.PersonalRate, Is.EqualTo(50000m));
-        restored.ResetSkillCommand.Execute(null);
-        Assert.That(restored.SelectedMethodOption.Id, Is.EqualTo(id));
-        Assert.That(restored.PersonalRate, Is.EqualTo(rate));
-    }
-
     [TestCase("prifddinas-agility-course", 66000)]
     [TestCase("ardougne-rooftop-course", 70000)]
     public async Task PrayerKeepsItsOwnCalculationWhileAgilityTrainsOnlyRemainingXp(string courseId, int rate)

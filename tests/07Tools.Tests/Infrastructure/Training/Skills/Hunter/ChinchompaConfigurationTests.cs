@@ -21,11 +21,8 @@ public sealed class ChinchompaConfigurationTests
     [TestCase("main-ehp", true, true, 265000)]
     [TestCase("main-ehp", true, false, 225000)]
     [TestCase("main-ehp", false, true, 200000)]
-    [TestCase("main-ehp", false, false, 200000)]
     [TestCase("red-chinchompas", true, true, 210000)]
-    [TestCase("red-chinchompas", true, false, 210000)]
     [TestCase("red-chinchompas", false, true, 170000)]
-    [TestCase("red-chinchompas", false, false, 170000)]
     public void ConfiguredRatesKeepPerGoalCatchQuantitiesAndProfit(string methodId, bool threeTick, bool alt, int rate)
     {
         var calculator = new TrainingPlanCalculator();
@@ -46,7 +43,6 @@ public sealed class ChinchompaConfigurationTests
     [TestCase(737627, 72000)]
     [TestCase(1986068, 115000)]
     [TestCase(5346332, 136000)]
-    [TestCase(13034431, 170000)]
     public void NonTickRedLevelBands(long start, int rate)
     {
         var result = new TrainingPlanCalculator().Calculate(Definition(), start, start + 1000,

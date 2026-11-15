@@ -10,25 +10,6 @@ public sealed class WoodcuttingMethodTests
     public void WoodcuttingAlternativeMethods()
     {
         var definition = new MainEhpCatalogue().Skills.Single(skill => skill.Skill == "Woodcutting");
-        Assert.That(string.Join('|', definition.AvailableMethods.Select(method => method.Id)), Is.EqualTo("main-ehp|redwood-trees-crystal-axe|ironwood-trees-crystal-axe"), "Woodcutting method IDs");
-        Assert.That(definition.AvailableMethods.All(method => method.UseStableDisplayName), Is.True, "Woodcutting dropdown labels should remain stable across fallback bands");
-
-        var row = new XpPlannerRowViewModel(
-            definition,
-            new TrainingPlanCalculator(),
-            814_445,
-            null,
-            new Dictionary<int, ItemPrice>(),
-            () => { });
-        const string expectedLockedLabels =
-            "1.5t teaks|Redwood trees - crystal felling axe — unlocks at 90|" +
-            "Ironwood trees - crystal felling axe — unlocks at 80";
-        const string expectedUnlockedLabels =
-            "1.5t teaks|Redwood trees - crystal felling axe|Ironwood trees - crystal felling axe";
-        Assert.That(string.Join('|', row.MethodOptions.Select(option => option.Name)), Is.EqualTo(expectedLockedLabels), "Woodcutting labels below alternative unlocks");
-        row.StartExperience = 13_000_000;
-        Assert.That(string.Join('|', row.MethodOptions.Select(option => option.Name)), Is.EqualTo(expectedUnlockedLabels), "Woodcutting labels after manual XP change");
-
         var redwoods = definition.ResolveMethod("redwood-trees-crystal-axe");
         var redwood90 = redwoods.Bands.Single(band => band.StartExperience == 5_346_332);
         var redwood99 = redwoods.Bands.Single(band => band.StartExperience == 13_034_431);

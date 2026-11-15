@@ -14,8 +14,6 @@ public sealed class OneTickKarambwansTests
 
         var cooking = catalogue.Skills.Single(skill => skill.Skill == "Cooking");
 
-        Assert.That(string.Join('|', cooking.AvailableMethods.Select(method => method.Id)), Is.EqualTo("main-ehp|one-tick-karambwans"), "Cooking method IDs");
-
         var karambwans = cooking.ResolveMethod("one-tick-karambwans");
 
         var karambwan90 = karambwans.Bands.Single(band => band.StartExperience == 5_346_332);

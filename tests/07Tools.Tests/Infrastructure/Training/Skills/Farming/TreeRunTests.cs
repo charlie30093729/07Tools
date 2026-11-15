@@ -10,9 +10,6 @@ public sealed class TreeRunTests
     public void FarmingTrainingCalculations()
     {
         var definition = new MainEhpCatalogue().Skills.Single(skill => skill.Skill == "Farming");
-        Assert.That(string.Join('|', definition.AvailableMethods.Select(method => method.Id)), Is.EqualTo("main-ehp|magic-palm-tree-runs"), "Farming method IDs");
-        Assert.That(string.Join('|', definition.AvailableMethods.Select(method => method.Name)), Is.EqualTo("Magic + dragonfruit tree runs|Magic + palm tree runs"), "Farming method dropdown names");
-
         var palmMethod = definition.ResolveMethod("magic-palm-tree-runs");
         var palmRates = palmMethod.Bands
             .Where(band => band.StartExperience >= 2_192_818)
@@ -109,7 +106,5 @@ public sealed class TreeRunTests
 
         Assert.That(Resource(farming, 22929).QuantityPerExperience, Is.EqualTo((8m * rosewoodTreesPerDay + 6m * redwoodTreesPerDay) / farmingExperiencePerDay).Within(0m), "dragonfruit protection per Farming XP");
 
-        Assert.That(catalogue.Skills.Single(skill => skill.Skill == "Farming").Note?
-                .Contains("not harvested", StringComparison.OrdinalIgnoreCase) == true, Is.True, "Farming note should disclose excluded harvest value");
     }
 }

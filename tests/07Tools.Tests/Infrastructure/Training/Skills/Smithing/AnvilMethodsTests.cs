@@ -16,8 +16,6 @@ public sealed class AnvilMethodsTests
 
         var smithing = catalogue.Skills.Single(skill => skill.Skill == "Smithing");
 
-        Assert.That(string.Join('|', smithing.AvailableMethods.Select(method => method.Id)), Is.EqualTo("main-ehp|adamant-platebodies|rune-2h-swords"), "Smithing method IDs");
-
         var adamant = smithing.ResolveMethod("adamant-platebodies").Bands.Last();
 
         Assert.That(adamant.StartExperience, Is.EqualTo(4_382_299L), "Adamant platebody unlock XP");

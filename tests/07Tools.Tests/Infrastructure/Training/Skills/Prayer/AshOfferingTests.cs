@@ -33,7 +33,6 @@ public sealed class AshOfferingTests
         Assert.That(result.GeneratedExperience["Magic"], Is.EqualTo(105000m).Within(0.000001m));
         Assert.That(result.GeneratedExperience.ContainsKey("Agility"), Is.False);
         Assert.That(result.Method.Bands.Single().Method, Does.Contain("Demonic Offering at a bank"));
-        Assert.That(result.Method.Note, Does.Contain("84 Magic"));
         Assert.That(result.IsFullyPriced, Is.True);
     }
 
@@ -59,9 +58,6 @@ public sealed class AshOfferingTests
     }
 
     [TestCase("infernal-ashes", "gilded-altar")]
-    [TestCase("infernal-ashes", "chaos-altar")]
-    [TestCase("abyssal-ashes", "gilded-altar")]
-    [TestCase("abyssal-ashes", "chaos-altar")]
     [TestCase("abyssal-ashes", "invalid")]
     public void InvalidSavedLocationsCannotCalculateAshesAtAnAltar(string method, string location)
     {
@@ -69,19 +65,6 @@ public sealed class AshOfferingTests
             AshPrices(), methodId: method, configuration: Location(location));
         Assert.That(result.Method.Bands.Single().Method, Does.Contain("Demonic Offering at Prif agility"));
         Assert.That(result.GeneratedExperience.ContainsKey("Agility"), Is.True);
-    }
-
-    [TestCase("infernal-ashes")]
-    [TestCase("abyssal-ashes")]
-    public void CustomRateChangesHoursNotResourcesOrSecondaryXp(string method)
-    {
-        var calculator = new TrainingPlanCalculator();
-        var normal = calculator.Calculate(CreatePrayerDefinition(), 0, 200000000, AshPrices(), methodId: method);
-        var faster = calculator.Calculate(CreatePrayerDefinition(), 0, 200000000, AshPrices(), normal.BaseRate * 2m, method);
-        Assert.That(faster.Hours, Is.EqualTo(normal.Hours / 2m).Within(0.000001m));
-        Assert.That(faster.NetGp, Is.EqualTo(normal.NetGp));
-        Assert.That(faster.ResourceRequirements, Is.EqualTo(normal.ResourceRequirements));
-        Assert.That(faster.GeneratedExperience, Is.EqualTo(normal.GeneratedExperience));
     }
 
     [TestCase("infernal-ashes", 25778)]

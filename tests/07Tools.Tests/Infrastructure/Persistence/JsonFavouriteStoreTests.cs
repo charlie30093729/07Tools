@@ -31,27 +31,6 @@ public sealed class JsonFavouriteStoreTests
     }
 
     [Test]
-    [Property("LegacyScenario", "JsonStoreDoesNotOverwrite")]
-    [Description("JSON store never overwrites existing state")]
-    public async Task JsonStoreDoesNotOverwrite()
-    {
-        using var temporary = new TemporaryDirectory();
-        var directory = temporary.Path;
-        var path = Path.Combine(directory, "favourites.json");
-        await File.WriteAllTextAsync(path, "[{\"itemId\":9,\"name\":\"Existing\",\"addedAt\":\"2026-01-01T00:00:00Z\"}]");
-        var store = new JsonFavouriteStore(new FavouriteStoreOptions
-        {
-            FilePath = path,
-            SeedJson = "[{\"itemId\":1,\"name\":\"Seed\",\"addedAt\":\"2026-01-01T00:00:00Z\"}]"
-        });
-
-        var items = await store.GetAllAsync();
-
-        Assert.That(items.Count, Is.EqualTo(1), "existing state count");
-        Assert.That(items[0].ItemId, Is.EqualTo(9), "existing item retained");
-    }
-
-    [Test]
     public async Task MovesSurviveRestartAndLaterAddRemoveOperations()
     {
         using var temporary = new TemporaryDirectory();
@@ -89,7 +68,11 @@ public sealed class JsonFavouriteStoreTests
         var path = Path.Combine(temporary.Path, "favourites.json");
         const string json = "[{\"itemId\":3,\"name\":\"Zulrah scale\",\"addedAt\":\"2026-01-01T00:00:00Z\"},{\"itemId\":1,\"name\":\"Adamant bar\",\"addedAt\":\"2026-01-01T00:00:00Z\"}]";
         await File.WriteAllTextAsync(path, json);
-        var store = new JsonFavouriteStore(new FavouriteStoreOptions { FilePath = path, SeedJson = "[]" });
+        var store = new JsonFavouriteStore(new FavouriteStoreOptions
+        {
+            FilePath = path,
+            SeedJson = "[{\"itemId\":9,\"name\":\"Conflicting seed\",\"addedAt\":\"2026-01-01T00:00:00Z\"}]"
+        });
 
         Assert.That((await store.GetAllAsync()).Select(item => item.ItemId), Is.EqualTo(new[] { 3, 1 }));
         Assert.That(await File.ReadAllTextAsync(path), Is.EqualTo(json));

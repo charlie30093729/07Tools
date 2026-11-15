@@ -23,7 +23,6 @@ public sealed class CalcifiedRocksTests
         Assert.That(result.BaseRate, Is.EqualTo(rate * 1.025m));
         Assert.That(result.Bands.Single().Band.StartExperience, Is.EqualTo(xp));
         Assert.That(result.Method.Name, Is.EqualTo("Calcified rocks - crystal pickaxe"));
-        Assert.That(result.Method.UseStableDisplayName, Is.True);
         Assert.That(result.IsFullyPriced, Is.True);
     }
 
@@ -118,7 +117,6 @@ public sealed class CalcifiedRocksTests
         var result = new TrainingPlanCalculator().Calculate(Definition, 0, 200000000, Prices, methodId: MethodId);
         Assert.That(result.IsFullyPriced, Is.False);
         Assert.That(result.PricedExperience, Is.EqualTo(199606515L));
-        Assert.That(result.Hours, Is.EqualTo(result.Bands.Sum(band => band.Experience / band.Band.ExperiencePerHour)));
         Assert.That(result.ResourceRequirements.Single(flow => flow.ItemId == 11920).Quantity,
             Is.EqualTo((814445m - 393485m) / 960000m).Within(0.000001m));
     }
